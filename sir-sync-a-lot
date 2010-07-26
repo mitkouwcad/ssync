@@ -58,8 +58,8 @@ private
 
     config = {}
 
-    config[:aws_access_key] = ask("What is the AWS access key?")
-    config[:aws_secret_key] = ask("What is the AWS secret access key?")
+    config[:aws_access_key] = ask("What is the AWS Access Key ID?")
+    config[:aws_secret_key] = ask("What is the AWS Secret Access Key?")
     display("Just a sec, ima check that works...")
     if aws_credentials_valid?(config)
       display("Yep, all good.")
