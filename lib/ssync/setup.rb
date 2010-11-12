@@ -3,8 +3,16 @@ module Ssync
     class << self
       include Helpers
 
+      def default_config
+        @default_config ||= read_default_config
+      end
+
+      def default_config=(config)
+        @default_config = config
+      end
+
       def config
-        @config
+        @config ||= read_config
       end
 
       def config=(config)
@@ -12,9 +20,7 @@ module Ssync
       end
 
       def run!
-        display "Welcome to Ssync! You will now be asked a few questions, the results will be stored at '#{config_path}'."
-
-        config = read_config
+        display "Welcome to Ssync! You will now be asked for a few questions."
 
         config[:aws_access_key] = ask config[:aws_access_key], "What is the AWS Access Key ID?"
         config[:aws_secret_key] = ask config[:aws_secret_key], "What is the AWS Secret Access Key?"
@@ -24,7 +30,7 @@ module Ssync
         if aws_credentials_is_valid?(config)
           display "Successfully connected to AWS."
 
-          config[:aws_dest_bucket] = ask config[:aws_dest_bucket], "Which bucket would you like to put your backups in? Ssync will create the bucket for you if it doesn't exist."
+          default_config[:last_used_bucket] = config[:aws_dest_bucket] = ask(config[:aws_dest_bucket], "Which bucket would you like to put your backups in? Ssync will create the bucket for you if it doesn't exist.")
 
           if bucket_exists?(config)
             if bucket_empty?(config)
@@ -53,9 +59,11 @@ module Ssync
 
         config[:find_options] = ask config[:find_options], "Do you have any options for 'find'? (e.g. \! -path *.git*)."
 
-        display "Writing the supplied details to '#{config_path}' for future reference ..."
+        display "Saving configuration data ..."
+        write_default_config!(default_config)
         write_config!(config)
-        display "All done! You may now use 'ssync sync' to syncronise your files to the S3 bucket."
+        display "All done! The configuration file is stored in '#{config_path}'."
+        display "You may now use 'ssync sync' to syncronise your files to the S3 bucket."
       end
 
       def aws_credentials_is_valid?(config = read_config)

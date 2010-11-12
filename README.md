@@ -28,6 +28,16 @@ To sync, run `ssync sync` and away it goes.
 In the case of a corrupted/incomplete synchronisation, run `ssync sync -f`
 or `ssync sync --force` to force a checksum comparison.
 
+## Sync to Multiple Buckets
+
+If you would like to sync to more than one S3 buckets, you may do so by:
+
+    ssync setup s3-bucket-name-1
+    ssync sync s3-bucket-name-1
+
+    ssync setup s3-bucket-name-2
+    ssync sync s3-bucket-name-2
+
 ## Why?
 
 This library was written because we needed to be able to back up loads of

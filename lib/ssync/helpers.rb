@@ -30,16 +30,24 @@ module Ssync
       Ssync::Command.action == action.to_sym
     end
 
-    def config_exists?
-      File.exist?(config_path)
+    def config_exists?(path = config_path)
+      File.exist?(path)
+    end
+
+    def ssync_filename
+      ".ssync-#{read_default_config[:last_used_bucket]}"
+    end
+
+    def default_config_path
+      "#{ENV['HOME']}/.ssync.defaults.yml"
     end
 
     def config_path
-      ENV['HOME'] + "/.ssync.yml"
+      "#{ENV['HOME']}/#{ssync_filename}.yml"
     end
 
     def lock_path
-      ENV['HOME'] + "/.ssync.lock"
+      "#{ENV['HOME']}/#{ssync_filename}.lock"
     end
 
     def aquire_lock!
@@ -62,8 +70,20 @@ module Ssync
       end
     end
 
+    def read_default_config
+      begin
+        open(default_config_path, "r") { |f| YAML::load(f) }
+      rescue
+        {}
+      end
+    end
+
     def write_config!(config)
       open(config_path, "w") { |f| YAML::dump(config, f) }
+    end
+
+    def write_default_config!(config)
+      open(default_config_path, "w") { |f| YAML::dump(config, f) }
     end
 
     def options_set?(*options)

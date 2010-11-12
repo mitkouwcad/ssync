@@ -45,11 +45,11 @@ module Ssync
       end
 
       def last_sync_started
-        ENV['HOME'] + "/.ssync.last-sync.started"
+        ENV['HOME'] + "/#{ssync_filename}.last-sync.started"
       end
 
       def last_sync_completed
-        ENV['HOME'] + "/.ssync.last-sync.completed"
+        ENV['HOME'] + "/#{ssync_filename}.last-sync.completed"
       end
 
       def last_sync_recorded?
@@ -99,19 +99,17 @@ module Ssync
       end
 
       def local_manifest_path
-        "/tmp/ssync.manifest.local"
+        "/tmp/#{ssync_filename}.manifest.local"
       end
 
       def parse_manifest(location)
         []
-        if File.exist?(location)
-          open(location, "r") do |file|
-            file.collect do |line|
-              path, checksum = *line.chomp.match(/^MD5\((.*)\)= (.*)$/).captures
-              { :path => path, :checksum => checksum }
-            end
+        open(location, "r") do |file|
+          file.collect do |line|
+            path, checksum = *line.chomp.match(/^MD5\((.*)\)= (.*)$/).captures
+            { :path => path, :checksum => checksum }
           end
-        end
+        end if File.exist?(location)
       end
 
       def push_file(file)
