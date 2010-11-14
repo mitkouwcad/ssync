@@ -27,11 +27,18 @@ module Ssync
     end
 
     def run!
+      util_check!
       pre_run_check!
       perform_action!
     end
 
     private
+
+    def util_check!
+      %w{find xargs openssl}.each do |util|
+        e! "You do not have '#{util}' installed on your operating system." if `which #{util}`.empty?
+      end
+    end
 
     def pre_run_check!
       if action_eq?(:sync) && !config_exists?(default_config_path) && !config_exists?
