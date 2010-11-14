@@ -45,11 +45,11 @@ module Ssync
       end
 
       def last_sync_started
-        ENV['HOME'] + "/#{ssync_filename}.last-sync.started"
+        "#{ssync_homedir}/#{ssync_filename}.last-sync.started"
       end
 
       def last_sync_completed
-        ENV['HOME'] + "/#{ssync_filename}.last-sync.completed"
+        "#{ssync_homedir}/#{ssync_filename}.last-sync.completed"
       end
 
       def last_sync_recorded?

@@ -34,20 +34,24 @@ module Ssync
       File.exist?(path)
     end
 
+    def ssync_homedir
+      "#{ENV['HOME']}/.ssync"
+    end
+
     def ssync_filename
-      ".ssync-#{read_default_config[:last_used_bucket]}"
+      "#{read_default_config[:last_used_bucket]}"
     end
 
     def default_config_path
-      "#{ENV['HOME']}/.ssync.defaults.yml"
+      "#{ssync_homedir}/defaults.yml"
     end
 
     def config_path
-      "#{ENV['HOME']}/#{ssync_filename}.yml"
+      "#{ssync_homedir}/#{ssync_filename}.yml"
     end
 
     def lock_path
-      "#{ENV['HOME']}/#{ssync_filename}.lock"
+      "#{ssync_homedir}/#{ssync_filename}.lock"
     end
 
     def aquire_lock!
@@ -83,7 +87,12 @@ module Ssync
     end
 
     def write_default_config!(config)
+      create_homedir!
       open(default_config_path, "w") { |f| YAML::dump(config, f) }
+    end
+
+    def create_homedir!
+      `mkdir #{ssync_homedir}` unless File.exists?(ssync_homedir)
     end
 
     def options_set?(*options)
