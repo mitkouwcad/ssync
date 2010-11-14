@@ -1,6 +1,6 @@
 # Ssync
 
-__Ssync__, an optimised S3 sync tool using the power of *nix!
+__Ssync__, an optimised S3 sync tool using the power of Unix!
 
 ## Requirements
 
@@ -46,7 +46,7 @@ That's where S3 is nice.
 
 We tried [s3sync](http://www.s3sync.net/) but it blew our server load (we do in excess of
 500,000 requests a day (page views, not including hits for images and what not,
-and the server needs to stay responsive). The secret sauce is using the *nix
+and the server needs to stay responsive). The secret sauce is using the Unix
 `find`, `xargs` and `openssl` commands to generate md5 checksums for comparison.
 Seems to work quite well for us (we have almost 90,000 files to compare).
 
