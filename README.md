@@ -19,7 +19,7 @@ __Ssync__, an optimised S3 sync tool using the power of Unix!
 To configure, run `ssync setup` and follow the prompts, you'll
 need your AWS keys, the local file path you want to back up, the bucket name
 to back up to, and any extra options to pass into find (i.e. for ignoring
-filepaths etc). It'll write the config to `~/.ssync.yml`.
+filepaths etc). It'll write the config to `~/.ssync/my-s3-bucket.yml`.
 
 ## Synchronisation
 
@@ -32,11 +32,13 @@ or `ssync sync --force` to force a checksum comparison.
 
 If you would like to sync to more than one S3 buckets, you may do so by:
 
-    ssync setup s3-bucket-name-1
-    ssync sync s3-bucket-name-1
+    ssync setup my-s3-bucket
+    ssync sync my-s3-bucket
 
-    ssync setup s3-bucket-name-2
-    ssync sync s3-bucket-name-2
+    ssync setup another-s3-bucket
+    ssync sync another-s3-bucket
+
+Running `ssync setup` and `ssync sync` without any bucket names defaults to using the last bucket you used.
 
 ## Why?
 
