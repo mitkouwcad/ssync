@@ -18,7 +18,7 @@ module Ssync
 
     def initialize(action = :sync, *args)
       @@action = action.to_sym
-      @@args   = *args
+      @@args   = args
 
       if @@args[0] && @@args[0][0, 1] != "-"
         Setup.default_config[:last_used_bucket] = @@args[0]
