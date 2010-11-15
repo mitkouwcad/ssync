@@ -3,4 +3,4 @@
 $:.unshift File.dirname(__FILE__) + "/../lib"
 require "ssync/command"
 
-Ssync::Command.run!(*ARGV)
+Ssync::Command.start

@@ -1,9 +1,5 @@
 module Ssync
   module Helpers
-    def display_help!
-      display("Not implemented yet.")
-    end
-
     def display(message)
       puts("[#{Time.now}] #{message}")
     end
@@ -26,10 +22,6 @@ module Ssync
       a.empty? ? config_item : a
     end
 
-    def action_eq?(action)
-      Ssync::Command.action == action.to_sym
-    end
-
     def config_exists?(path = config_path)
       File.exist?(path)
     end
@@ -46,8 +38,8 @@ module Ssync
       "#{ssync_homedir}/defaults.yml"
     end
 
-    def config_path
-      "#{ssync_homedir}/#{ssync_filename}.yml"
+    def config_path(filename = nil)
+      "#{ssync_homedir}/#{filename || ssync_filename}.yml"
     end
 
     def lock_path
@@ -55,14 +47,15 @@ module Ssync
     end
 
     def aquire_lock!
+      return unless lock_path
       # better way is to write out the pid ($$) and read it back in, to make sure it's the same
       e! "Found a lock at #{lock_path}, is another instance of Ssync running?" if File.exist?(lock_path)
 
       begin
-        system "touch #{lock_path}"
+        system "touch #{lock_path}" unless ssync_filename.empty?
         yield
       ensure
-        system "rm #{lock_path}"
+        system "rm -f #{lock_path}"
       end
     end
 
@@ -93,13 +86,6 @@ module Ssync
 
     def create_homedir!
       `mkdir #{ssync_homedir}` unless File.exists?(ssync_homedir)
-    end
-
-    def options_set?(*options)
-      false
-      [options].flatten.each do |option|
-        return true if Command.args.include?("#{option.to_s}")
-      end
     end
   end
 end

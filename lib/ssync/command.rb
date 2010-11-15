@@ -1,64 +1,52 @@
 require "ssync"
+require "thor"
 
 module Ssync
-  class Command
+  class Command < ::Thor
     include Helpers
 
-    def self.action
-      @@action
-    end
+    default_task :sync
 
-    def self.args
-      @@args
-    end
-
-    def self.run!(*args)
-      new(*args).run!
-    end
-
-    def initialize(action = :sync, *args)
-      @@action = action.to_sym
-      @@args   = args
-
-      if @@args[0] && @@args[0][0, 1] != "-"
-        Setup.default_config[:last_used_bucket] = @@args[0]
-        write_default_config!(Setup.default_config)
-      end
-    end
-
-    def run!
-      util_check!
-      pre_run_check!
-      perform_action!
-    end
-
-    private
-
-    def util_check!
+    desc "setup", "Sets up a configuration file for syncing"
+    method_option "bucket", :aliases => "-b", :type => :string,
+      :banner => "The S3 bucket (configurated with Ssync) to sync to"
+    def setup
       %w{find xargs openssl}.each do |util|
         e! "You do not have '#{util}' installed on your operating system." if `which #{util}`.empty?
       end
+
+      if options.bucket?
+        e! "The S3 bucket config for '#{options.bucket}' does not exist." unless config_exists?(config_path(options.bucket))
+        write_default_config(options.bucket)
+      end
+      aquire_lock! { Ssync::Setup.run! }
     end
 
-    def pre_run_check!
-      if action_eq?(:sync) && !config_exists?(default_config_path) && !config_exists?
+    desc "sync", "Syncs to Amazon S3"
+    method_option "bucket", :aliases => "-b", :type => :string,
+      :banner => "The S3 bucket (configurated with Ssync) to sync to"
+    method_option "force", :aliases => "-f", :type => :boolean,
+      :banner => "Forces a recalculate of the checksum, useful when the previous sync was incomplete or corrupted"
+    def sync
+      unless config_exists?(default_config_path) || config_exists?
         e! "Cannot run the sync, there is no Ssync configuration, try 'ssync setup' to create one first."
       end
+
+      write_default_config(options.bucket) if options.bucket?
+      aquire_lock! { Ssync::Sync.run!(options) }
     end
 
-    def perform_action!
-      case @@action
-      when :setup
-        Ssync::Setup.run!
-      when :sync
-        aquire_lock! { Ssync::Sync.run! }
-      when :help, :"--help", :"-h"
-        display_help!
-      when :version, :"--version", :"-v"
-        puts Ssync::VERSION
-      else
-        e! "Cannot perform action '#{@action}', try 'ssync help' for usage."
-      end
+    desc "version", "Prints Ssync's version information"
+    def version
+      puts "Ssync #{Ssync::VERSION}"
+    end
+    map %w{-v --version} => :version
+
+    private
+
+    def write_default_config(bucket)
+      Setup.default_config[:last_used_bucket] = bucket
+      write_default_config!(Setup.default_config)
     end
   end
 end

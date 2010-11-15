@@ -21,4 +21,5 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
 
   s.add_runtime_dependency(%q<aws-s3>, ["~> 0.6.2"])
+  s.add_runtime_dependency(%q<thor>, ["~> 0.14.4"])
 end

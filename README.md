@@ -31,13 +31,19 @@ or `ssync sync --force` to force a checksum comparison.
 
 If you would like to sync to more than one S3 buckets, you may do so by:
 
-    ssync setup my-s3-bucket
-    ssync sync my-s3-bucket
+    ssync setup -b my-s3-bucket
+    ssync sync -b my-s3-bucket
 
-    ssync setup another-s3-bucket
-    ssync sync another-s3-bucket
+    ssync setup -b another-s3-bucket
+    ssync sync -b another-s3-bucket
 
 Running `ssync setup` and `ssync sync` without any bucket names defaults to using the last bucket you used.
+
+## Need Help?
+
+Use the command below to get to the help screen.
+
+    ssync help
 
 ## Why?
 

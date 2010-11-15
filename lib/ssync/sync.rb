@@ -3,14 +3,14 @@ module Ssync
     class << self
       include Helpers
 
-      def run!
+      def run!(options)
         display "Initialising Ssync, performing pre-sync checks ..."
 
         e! "Couldn't connect to AWS with the credentials specified in '#{config_path}'." unless Setup.aws_credentials_is_valid?
         e! "Couldn't find the S3 bucket specified in '#{config_path}'." unless Setup.bucket_exists?
         e! "The local path specified in '#{config_path}' does not exist." unless Setup.local_file_path_exists?
 
-        if options_set?("-f", "--force")
+        if options.force?
           display "Clearing previous sync state ..."
           clear_sync_state
         end
