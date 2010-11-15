@@ -7,8 +7,8 @@ Gem::Specification.new do |s|
   s.date              = Date.today.to_s
   s.authors           = ["Fred Wu", "Ryan Allen"]
   s.email             = ["fred@envato.com", "ryan@envato.com"]
-  s.summary           = %q{Ssync, an optimised S3 sync tool using the power of *nix!}
-  s.description       = %q{Ssync, an optimised S3 sync tool using the power of *nix!}
+  s.summary           = %q{Ssync, an optimised S3 sync tool using the power of Unix!}
+  s.description       = %q{Ssync, an optimised S3 sync tool using the power of Unix!}
   s.homepage          = %q{http://github.com/fredwu/ssync}
   s.extra_rdoc_files  = ["README.md"]
   s.rdoc_options      = ["--charset=UTF-8"]

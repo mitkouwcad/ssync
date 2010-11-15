@@ -6,7 +6,7 @@ __Ssync__, an optimised S3 sync tool using the power of Unix!
 
 - Ruby 1.8 or 1.9
 - RubyGems
-- 'aws-s3' rubygem
+- 'aws-s3' and 'thor' rubygems
 - `find`, `xargs` and `openssl`
 
 ## Installation
