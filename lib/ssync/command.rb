@@ -52,8 +52,10 @@ module Ssync
         Ssync::Setup.run!
       when :sync
         aquire_lock! { Ssync::Sync.run! }
-      when :help
+      when :help, :"--help", :"-h"
         display_help!
+      when :version, :"--version", :"-v"
+        puts Ssync::VERSION
       else
         e! "Cannot perform action '#{@action}', try 'ssync help' for usage."
       end
