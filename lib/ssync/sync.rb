@@ -113,9 +113,14 @@ module Ssync
       end
 
       def push_file(file)
+        relative_file_path = file[:path].gsub( config[:local_file_path], config[:s3_file_path] )
+        
         # xfer speed, logging, etc can occur in this method
         display "Pushing '#{file[:path]}' ..."
-        AWS::S3::S3Object.store(file[:path], open(file[:path]), read_config[:aws_dest_bucket])
+
+
+        AWS::S3::S3Object.store(relative_file_path, open(file[:path]), read_config[:aws_dest_bucket])
+        #AWS::S3::S3Object.store(file[:path], open(file[:path]), read_config[:aws_dest_bucket])
       rescue
         e "Could not push '#{file[:path]}': #{$!.inspect}"
       end

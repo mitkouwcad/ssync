@@ -57,6 +57,8 @@ module Ssync
           e! "The path you specified does not exist!"
         end
 
+        config[:s3_file_path] = ask config[:s3_file_path], "What is the destination path on S3? (Leave blank if you wish to map exactly to the local path)"
+
         config[:find_options] = ask config[:find_options], "Do you have any options for 'find'? (e.g. \! -path *.git*)."
 
         display "Saving configuration data ..."
