@@ -3,6 +3,8 @@ module Ssync
     class << self
       include Helpers
 
+      CANNED_POLICIES = {:p => :private, :r => :public_read, :w => :public_read_write, :a => :authenticated_read}
+
       def default_config
         @default_config ||= read_default_config
       end
@@ -57,15 +59,17 @@ module Ssync
           e! "The path you specified does not exist!"
         end
 
-        config[:s3_file_path] = ask config[:s3_file_path], "What is the destination path on S3? (Leave blank if you wish to map exactly to the local path)"
+        config[:s3_file_path] = ask config[:s3_file_path], "What is the destination path on S3? (Leave blank if you wish to have a relative path)"
 
         config[:find_options] = ask config[:find_options], "Do you have any options for 'find'? (e.g. \! -path *.git*)."
 
+        config[:access] = ask config[:access], "What access control policies do you wish to use? (p)rivate [default], public_(r)ead, public_read_(w)rite or (a)uthenticated_read?"
+        config[:access] = CANNED_POLICIES.keys.include?(config[:access].to_sym) ? CANNED_POLICIES[ config[:access].to_sym ] : :private 
         display "Saving configuration data ..."
         write_default_config!(default_config)
         write_config!(config)
         display "All done! The configuration file is stored in '#{config_path}'."
-        display "You may now use 'ssync sync' to syncronise your files to the S3 bucket."
+        display "You may now use 'ssync sync' to synchronise your files to the S3 bucket."
       end
 
       def aws_credentials_is_valid?(config = read_config)
