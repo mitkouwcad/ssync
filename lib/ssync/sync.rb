@@ -113,7 +113,7 @@ module Ssync
       end
 
       def push_file(file)
-        relative_file_path = file[:path].gsub( config[:local_file_path], config[:s3_file_path] )
+        relative_file_path = file[:path].gsub( read_config[:local_file_path], read_config[:s3_file_path] )
         
         # xfer speed, logging, etc can occur in this method
         display "Pushing '#{file[:path]}' ..."
