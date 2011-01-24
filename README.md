@@ -1,3 +1,5 @@
+[![](http://stillmaintained.com/fredwu/authlite.png)](http://stillmaintained.com/fredwu/authlite)
+
 # Ssync
 
 __Ssync__, an optimised S3 sync tool using the power of Unix!
