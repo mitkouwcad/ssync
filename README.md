@@ -1,4 +1,4 @@
-[![](http://stillmaintained.com/fredwu/authlite.png)](http://stillmaintained.com/fredwu/authlite)
+[![](http://stillmaintained.com/fredwu/ssync.png)](http://stillmaintained.com/fredwu/ssync)
 
 # Ssync
 
