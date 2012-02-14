@@ -117,9 +117,10 @@ module Ssync
         
         # xfer speed, logging, etc can occur in this method
         display "Pushing '#{file[:path]}' to #{relative_file_path} ..."
+        options = {:access => read_config[:access]}
+        options['x-amz-storage-class'] = 'REDUCED_REDUNDANCY' if read_config[:reduced_redundancy]=='yes'
 
-
-        AWS::S3::S3Object.store(relative_file_path, open(file[:path]), read_config[:aws_dest_bucket], :access => read_config[:access])
+        AWS::S3::S3Object.store(relative_file_path, open(file[:path]), read_config[:aws_dest_bucket], options)
       rescue
         e "Could not push '#{file[:path]}': #{$!.inspect}"
       end
