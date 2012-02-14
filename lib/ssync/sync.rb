@@ -29,11 +29,16 @@ module Ssync
           # this behaviour may be desirable (ala rsync --delete) but we currently don't support it.
           display "Performing checksum comparison ..."
           files_on_localhost_with_checksums - files_on_s3
-        end.each { |file| push_file(file) }
+        end.each do |file|
+          encrypt_file(file) if encrypting?
+          push_file(file)
+        end
 
         finalize_sync_state
 
         display "Sync complete!"
+        clean_up_encrypted if encrypting?
+        
       end
 
       def clear_sync_state
@@ -111,16 +116,40 @@ module Ssync
           end
         end if File.exist?(location)
       end
+      
+      def encrypting?
+        read_config[:encryption_recipient].strip.size > 2
+      end
+      
+      def encrypt_file(file)
+        file[:encrypted_path] = '/tmp/'+file[:path].gsub('/','_')+'.gpg'
+        display "Encrypting #{file[:path]}..."
+        `gpg --encrypt -o #{file[:encrypted_path]} -r #{read_config[:encryption_recipient]} -e #{file[:path]}`
+      end
+      
+      def clean_up_encrypted
+        display "Cleaning up..."
+        sleep 30 #TODO: I know this is stupid, will fix later
+        @list_to_delete.each{|file| `rm -f #{file}`}
+      end
 
       def push_file(file)
         relative_file_path = file[:path].gsub( read_config[:local_file_path], (read_config[:s3_file_path] || '') )
+        if encrypting?
+          relative_file_path += '.gpg'
+          source_path = file[:encrypted_path]
+          @list_to_delete = []
+        else
+          source_path = file[:path]
+        end
         
         # xfer speed, logging, etc can occur in this method
         display "Pushing '#{file[:path]}' to #{relative_file_path} ..."
         options = {:access => read_config[:access]}
         options['x-amz-storage-class'] = 'REDUCED_REDUNDANCY' if read_config[:reduced_redundancy]=='yes'
 
-        AWS::S3::S3Object.store(relative_file_path, open(file[:path]), read_config[:aws_dest_bucket], options)
+        AWS::S3::S3Object.store(relative_file_path, open(source_path), read_config[:aws_dest_bucket], options)
+        @list_to_delete << source_path if encrypting?
       rescue
         e "Could not push '#{file[:path]}': #{$!.inspect}"
       end

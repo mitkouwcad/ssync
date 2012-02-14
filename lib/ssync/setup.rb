@@ -67,6 +67,8 @@ module Ssync
         config[:find_options] = ask config[:find_options], "Do you have any options for 'find'? (e.g. \! -path *.git*)."
         
         config[:reduced_redundancy] = ask config[:reduced_redundancy], "Do you want to use reduced redundancy storage (yes/no)?"
+        
+        config[:encryption_recipient] = ask config[:encryption_recipient], "If you want to encrypt the files before uploading them, please enter the recipient (to identify the key by)"
 
         config[:access] = ask config[:access], "What access control policies do you wish to use? (p)rivate [default], public_(r)ead, public_read_(w)rite or (a)uthenticated_read?"
         config[:access] = CANNED_POLICIES.keys.include?(config[:access].to_sym) ? CANNED_POLICIES[ config[:access].to_sym ] : :private 
