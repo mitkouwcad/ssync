@@ -24,6 +24,7 @@ module Ssync
       def run!
         display "Welcome to Ssync! You will now be asked for a few questions."
 
+        reconfiguring = config[:aws_access_key].strip.size > 2
         config[:aws_access_key] = ask config[:aws_access_key], "What is the AWS Access Key ID?"
         config[:aws_secret_key] = ask config[:aws_secret_key], "What is the AWS Secret Access Key?"
 
@@ -37,6 +38,8 @@ module Ssync
           if bucket_exists?(config)
             if bucket_empty?(config)
               display "The bucket exists and is empty, great!"
+            elsif reconfiguring
+              display "The bucket exists and is not empty, but we seem to be already using it, so that's ok (I hope)."
             else
               e! "The bucket exists but is not empty, we cannot sync to a bucket that is not empty!"
             end
