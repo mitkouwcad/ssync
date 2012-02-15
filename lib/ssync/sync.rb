@@ -2,6 +2,7 @@ module Ssync
   class Sync
     class << self
       include Helpers
+      CLEANUP_DELAY = 45 #how much (in seconds) to wait before we delete a tmp file
 
       def run!(options)
         display "Initialising Ssync, performing pre-sync checks ..."
@@ -37,7 +38,7 @@ module Ssync
         finalize_sync_state
 
         display "Sync complete!"
-        clean_up_encrypted if encrypting?
+        clean_up_encrypted(true) if encrypting?
         
       end
 
@@ -127,10 +128,21 @@ module Ssync
         `gpg --encrypt -o #{file[:encrypted_path]} -r #{read_config[:encryption_recipient]} -e #{file[:path]}`
       end
       
-      def clean_up_encrypted
-        display "Cleaning up..."
-        sleep 30 #TODO: I know this is stupid, will fix later
-        @list_to_delete.each{|file| `rm -f #{file}`}
+      def clean_up_encrypted(finished)
+        if(finished)
+          display "Final clean up... (waiting #{CLEANUP_DELAY} secs to make sure buffers are flushed etc)"
+          sleep CLEANUP_DELAY
+          display "Deleting #{@list_to_delete.size} stragglers"
+          @list_to_delete.each{|key,value| `rm -f #{key}`}
+        else
+          @list_to_delete.each do |key,value|
+            if(Time.now - value > CLEANUP_DELAY) #delete if old enough
+              display "Delete: #{key}"
+              `rm -f #{key}`
+              @list_to_delete.delete(key)
+            end
+          end
+        end
       end
 
       def push_file(file)
@@ -138,7 +150,7 @@ module Ssync
         if encrypting?
           relative_file_path += '.gpg'
           source_path = file[:encrypted_path]
-          @list_to_delete = []
+          @list_to_delete ||= {}
         else
           source_path = file[:path]
         end
@@ -149,7 +161,11 @@ module Ssync
         options['x-amz-storage-class'] = 'REDUCED_REDUNDANCY' if read_config[:reduced_redundancy]=='yes'
 
         AWS::S3::S3Object.store(relative_file_path, open(source_path), read_config[:aws_dest_bucket], options)
-        @list_to_delete << source_path if encrypting?
+        
+        if encrypting?
+          @list_to_delete[source_path] = Time.now
+          clean_up_encrypted(false)
+        end
       rescue
         e "Could not push '#{file[:path]}': #{$!.inspect}"
       end
