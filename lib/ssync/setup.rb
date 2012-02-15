@@ -24,7 +24,7 @@ module Ssync
       def run!
         display "Welcome to Ssync! You will now be asked for a few questions."
 
-        reconfiguring = config[:aws_access_key].strip.size > 2
+        reconfiguring = !config[:aws_access_key].nil? && config[:aws_access_key].strip.size > 2
         config[:aws_access_key] = ask config[:aws_access_key], "What is the AWS Access Key ID?"
         config[:aws_secret_key] = ask config[:aws_secret_key], "What is the AWS Secret Access Key?"
 
