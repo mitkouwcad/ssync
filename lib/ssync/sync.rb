@@ -129,19 +129,23 @@ module Ssync
       end
       
       def clean_up_encrypted(finished)
-        if(finished)
-          display "Final clean up... (waiting #{CLEANUP_DELAY} secs to make sure buffers are flushed etc)"
-          sleep CLEANUP_DELAY
-          display "Deleting #{@list_to_delete.size} stragglers"
-          @list_to_delete.each{|key,value| `rm -f #{key}`}
-        else
-          @list_to_delete.each do |key,value|
-            if(Time.now - value > CLEANUP_DELAY) #delete if old enough
-              display "Delete: #{key}"
-              `rm -f #{key}`
-              @list_to_delete.delete(key)
+        if(@list_to_delete && @list_to_delete.size > 0)
+          if(finished)
+            display "Final clean up... (waiting #{CLEANUP_DELAY} secs to make sure buffers are flushed etc)"
+            sleep CLEANUP_DELAY
+            display "Deleting #{@list_to_delete.size} stragglers"
+            @list_to_delete.each{|key,value| `rm -f #{key}`}
+          else
+            @list_to_delete.each do |key,value|
+              if(Time.now - value > CLEANUP_DELAY) #delete if old enough
+                display "Delete: #{key}"
+                `rm -f #{key}`
+                @list_to_delete.delete(key)
+              end
             end
           end
+        else
+          display "Nothing to clean"
         end
       end
 
