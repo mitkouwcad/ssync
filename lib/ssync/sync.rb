@@ -128,7 +128,7 @@ module Ssync
         display "Encrypting #{file[:path]}..."
         path = Shellwords.escape(file[:path])
         encpath = Shellwords.escape(file[:encrypted_path])
-        `gpg --encrypt -o "#{encpath}" -r #{read_config[:encryption_recipient]} -e "#{path}"`
+        `gpg --encrypt -o #{encpath} -r #{read_config[:encryption_recipient]} -e #{path}`
       end
       
       def clean_up_encrypted(finished)
