@@ -123,9 +123,12 @@ module Ssync
       end
       
       def encrypt_file(file)
+        require 'shellwords'
         file[:encrypted_path] = '/tmp/'+file[:path].gsub('/','_')+'.gpg'
         display "Encrypting #{file[:path]}..."
-        `gpg --encrypt -o #{file[:encrypted_path]} -r #{read_config[:encryption_recipient]} -e #{file[:path]}`
+        path = Shellwords.escape(file[:path])
+        encpath = Shellwords.escape(file[:encrypted_path])
+        `gpg --encrypt -o "#{encpath}" -r #{read_config[:encryption_recipient]} -e "#{path}"`
       end
       
       def clean_up_encrypted(finished)
